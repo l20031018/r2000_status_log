@@ -1,9 +1,16 @@
 import schedule
 import time
-import urllib.request
+
 import configparser
 import json
 from datetime import datetime
+import sys
+if sys.version_info.major == 3:
+    py_version = 3
+    import urllib.request
+else:
+    py_version = 2
+    import urlib2
 
 
 def job(arg):
@@ -19,10 +26,13 @@ def create_url(ip, l):
 
 
 def set_para():
-    global ip, l
+    global ip, l, py_version
     print(create_url(ip, l))
     print('sending command')
-    response = urllib.request.urlopen(create_url(ip, l))
+    if py_version == 3:
+        response = urllib.request.urlopen(create_url(ip, l))
+    else:
+        response = urllib2.urlopen(create_url(ip, l))
     j = response.read()
     result = json.loads(j)
     if result["error_code"] == 0 and result["error_text"] == 'success':
@@ -37,9 +47,12 @@ def log_fun(texts):
 
 
 def log_status():
-    global ip, l
+    global ip, l, py_version
     request_status = 'http://' + ip + '/cmd/get_parameter?list=status_flags'
-    response = urllib.request.urlopen(request_status)
+    if py_version == 3:
+        response = urllib.request.urlopen(request_status)
+    else:
+        response = urllib2.urlopen(request_status)
     j = response.read()
     result = json.loads(j)
     b1 = result["status_flags"]
@@ -70,9 +83,12 @@ def log_status():
 
 
 def log_temperature():
-    global ip, l
+    global ip, l, py_version
     request_temperature = 'http://' + ip + '/cmd/get_parameter?list=temperature_current'
-    response = urllib.request.urlopen(request_temperature)
+    if py_version == 3:
+        response = urllib.request.urlopen(request_temperature)
+    else:
+        response = urllib2.urlopen(request_temperature)
     j = response.read()
     result = json.loads(j)
     b1 = result["temperature_current"]
